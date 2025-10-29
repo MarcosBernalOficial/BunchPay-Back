@@ -42,15 +42,15 @@ public class CardService {
     }
 
     private String generateCvv() {
-        return String.format("%03d", new Random().nextInt(1000));
+        return "%03d".formatted(new Random().nextInt(1000));
     }
 
-    private String maskCardNumber(String number){
+    private String maskCardNumber(String number) {
         return "**** **** **** " + number.substring(number.length() - 4);
     }
 
-    //To transform a card to dto
-    private CardDto toDto(Card card){
+    // To transform a card to dto
+    private CardDto toDto(Card card) {
         CardDto dto = new CardDto();
 
         dto.setCardHolderName(card.getOwnerName());
@@ -62,7 +62,7 @@ public class CardService {
         return dto;
     }
 
-    public CardDto getOneCard(String email){
+    public CardDto getOneCard(String email) {
         Card card = cardRepository.findByClientEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontro la tarjeta."));
 

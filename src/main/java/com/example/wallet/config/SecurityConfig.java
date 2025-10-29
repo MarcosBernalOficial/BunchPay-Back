@@ -21,12 +21,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfig = new org.springframework.web.cors.CorsConfiguration();
@@ -40,13 +40,12 @@ public class SecurityConfig {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**",
-                                "/swagger-ui/**", //Swagger UI estático
-                                "/swagger-ui.html", //Entrada principal
-                                "/v3/api-docs/**", //Doc de OpenAPI en JSON
+                                "/swagger-ui/**", // Swagger UI estático
+                                "/swagger-ui.html", // Entrada principal
+                                "/v3/api-docs/**", // Doc de OpenAPI en JSON
                                 "/v3/api-docs" // Ruta base
                         ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
