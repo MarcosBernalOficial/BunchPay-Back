@@ -52,7 +52,6 @@ public class SupportChatController {
         return ResponseEntity.ok(dtos);
     }
 
-
     @Operation(summary = "Obtener mensajes de un chat", description = "Devuelve la lista de mensajes de un chat")
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<List<MessageDto>> getMessages(@PathVariable Long chatId, Authentication auth) {
@@ -65,8 +64,8 @@ public class SupportChatController {
     @Operation(summary = "Enviar mensaje", description = "Envia un mensaje de un cliente al soporte")
     @PostMapping("/{chatId}/send")
     public ResponseEntity<MessageDto> sendMessage(@PathVariable Long chatId,
-                                                  @RequestBody String content,
-                                                  Authentication auth) {
+            @RequestBody String content,
+            Authentication auth) {
         Support sender = supportService.getByEmail(auth.getName());
         Chat chat = chatService.getChatById(chatId).orElseThrow(() -> new RuntimeException("Chat no encontrado"));
         Message msg = messageService.sendMessage(chat, sender, content);
