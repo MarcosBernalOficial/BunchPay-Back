@@ -1,17 +1,9 @@
 package com.example.wallet.utils;
+
 import java.security.SecureRandom;
 import java.util.UUID;
 
-import static org.hibernate.annotations.UuidGenerator.Style.RANDOM;
-
 public class IdGenerator {
-    /*
-     * Genera un ID alfanumérico usando UUID, con una longitud máxima definida.
-     * Si la longitud es mayor a 32, se concatenan múltiples UUIDs sin guiones.
-     *
-     * @param length la longitud deseada del ID
-     * @return un ID alfanumérico aleatorio
-     */
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public static String generate() {
@@ -38,4 +30,3 @@ public class IdGenerator {
         return id.toString();
     }
 }
-

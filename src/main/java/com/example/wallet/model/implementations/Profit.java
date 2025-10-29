@@ -1,6 +1,5 @@
 package com.example.wallet.model.implementations;
 
-import com.example.wallet.model.implementations.AccountClient;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +26,3 @@ public class Profit {
 
     private LocalDate date;
 }
-

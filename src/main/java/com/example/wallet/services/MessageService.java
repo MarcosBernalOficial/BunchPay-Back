@@ -1,11 +1,9 @@
 package com.example.wallet.services;
 
-import com.example.wallet.model.enums.Role;
 import com.example.wallet.model.implementations.Chat;
 import com.example.wallet.model.implementations.Message;
 import com.example.wallet.model.implementations.User;
 import com.example.wallet.repository.MessageRepository;
-import com.example.wallet.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,6 @@ public class MessageService {
 
     @Autowired
     private MessageRepository messageRepository;
-    private NotificationService notificationService;
 
     public List<Message> getMessagesByChat(Chat chat) {
         return messageRepository.findByChatOrderByDateAsc(chat);
@@ -30,7 +27,6 @@ public class MessageService {
         List<Message> messages = messageRepository.findByChat(chat);
         messageRepository.deleteAll(messages);
     }
-
 
     public Message sendMessage(Chat chat, User sender, String content) {
         Message message = new Message();

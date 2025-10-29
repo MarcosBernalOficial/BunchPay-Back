@@ -5,7 +5,6 @@ import com.example.wallet.dtos.*;
 import com.example.wallet.model.enums.Role;
 import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.model.implementations.Client;
-import com.example.wallet.model.implementations.Support;
 import com.example.wallet.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -62,7 +61,7 @@ public class ClientService {
         return client;
     }
 
-    //ViewProfile
+    // ViewProfile
     public ClientProfileDto getProfile(String email) {
         Client client = clientRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedAccessException("Cliente no encontrado con email: " + email));
@@ -76,8 +75,8 @@ public class ClientService {
         return dto;
     }
 
-    //UpdateProfile
-    public void updateProfile(String email, UserUpdateDto dto){
+    // UpdateProfile
+    public void updateProfile(String email, UserUpdateDto dto) {
         Client client = clientRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedAccessException("Cliente no encontrado. Inicie sesion."));
 
@@ -87,14 +86,14 @@ public class ClientService {
         clientRepository.save(client);
     }
 
-    //ChangePassword
+    // ChangePassword
     public void changePassword(String email, PasswordChangeDto dto) {
         Client client = clientRepository.findByEmail(email)
-                .orElseThrow(()-> new UnauthorizedAccessException("Cliente no encontrado. Inicie sesion."));
-        if(!passwordEncoder.matches(dto.getCurrentPassword(), client.getPassword())) {
+                .orElseThrow(() -> new UnauthorizedAccessException("Cliente no encontrado. Inicie sesion."));
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), client.getPassword())) {
             throw new InvalidLoginException("La contraseña actual no es correcta.");
         }
-        if(passwordEncoder.matches(dto.getNewPassword(), client.getPassword())){
+        if (passwordEncoder.matches(dto.getNewPassword(), client.getPassword())) {
             throw new RepeatedPasswordException("La nueva contraseña no puede ser igual a la actual.");
         }
         String newEncodedPassword = passwordEncoder.encode(dto.getNewPassword());

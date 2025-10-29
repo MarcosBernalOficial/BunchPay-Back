@@ -1,12 +1,8 @@
 package com.example.wallet.model.implementations;
 
-import com.example.wallet.model.implementations.AccountClient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -31,4 +27,3 @@ public class DiscountCoupon {
 
     private LocalDate expirationDate;
 }
-

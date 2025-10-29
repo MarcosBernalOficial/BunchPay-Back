@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "client")
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Client extends User {

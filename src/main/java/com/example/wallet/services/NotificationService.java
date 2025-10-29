@@ -2,7 +2,6 @@ package com.example.wallet.services;
 
 import com.example.wallet.model.implementations.Client;
 import com.example.wallet.model.implementations.Notification;
-import com.example.wallet.model.implementations.Support;
 import com.example.wallet.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,6 @@ public class NotificationService {
         notif.setRead(false);
         notificationRepository.save(notif);
     }
-
 
     public List<Notification> getNotificationsForClient(Long clientId) {
         return notificationRepository.findByClientIdOrderByCreatedAtDesc(clientId);

@@ -1,6 +1,5 @@
 package com.example.wallet.services;
 
-
 import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.model.implementations.DiscountCoupon;
 import com.example.wallet.repository.AccountClientRepository;
@@ -11,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -25,8 +23,7 @@ public class DiscountCouponService {
 
     private static final List<String> COMPANIES = List.of(
             "McDonalds", "BurgerKing", "Mostaza", "Starbucks", "Kevingston", "Luccianos",
-            "Dexter", "Adidas", "Nike", "Under Armour", "Crocs", "Camaron Brujo", "Stanley"
-    );
+            "Dexter", "Adidas", "Nike", "Under Armour", "Crocs", "Camaron Brujo", "Stanley");
 
     private final Random random = new Random();
 
@@ -97,4 +94,3 @@ public class DiscountCouponService {
         return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }
-

@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "support")
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Support extends User {

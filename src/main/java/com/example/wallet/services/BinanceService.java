@@ -22,6 +22,7 @@ public class BinanceService {
         return restTemplate.getForObject(url, CryptoPriceDto.class);
     }
 
+    @SuppressWarnings("static-access")
     public Optional<List<CryptoPriceDto>> getAllPrices() {
         List<String> symbols = List.of("BTCARS", "ETHARS", "USDTARS");
         return Optional.of(symbols.stream()

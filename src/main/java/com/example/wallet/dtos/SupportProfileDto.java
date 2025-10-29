@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
-public class SupportProfileDto extends UserProfileDto{
+@EqualsAndHashCode(callSuper = false)
+public class SupportProfileDto extends UserProfileDto {
     private Long id;
     private String firstName;
     private String lastName;
