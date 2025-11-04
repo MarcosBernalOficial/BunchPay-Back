@@ -4,6 +4,7 @@ import com.example.wallet.controllers.exceptions.UnauthorizedAccessException;
 import com.example.wallet.dtos.SupportProfileDto;
 import com.example.wallet.model.implementations.Support;
 import com.example.wallet.repository.SupportRepository;
+import com.example.wallet.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,11 @@ public class SupportService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-
     @Autowired
     private SupportRepository supportRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
 
     public Support getByEmail(String email) {
         return supportRepository.findByEmail(email)
@@ -31,6 +34,12 @@ public class SupportService {
     }
 
     public Support save(Support support) {
+        // Verificar email duplicado en clientes también
+        if (clientRepository.findByEmail(support.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("El correo ya está registrado.");
+        }
+
+        // Verificar email duplicado en soporte
         if (supportRepository.findByEmail(support.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("El correo ya está registrado.");
         }
@@ -54,8 +63,6 @@ public class SupportService {
 
         return supportRepository.save(support);
     }
-
-
 
     public void deleteSupportById(Long id) {
         if (!supportRepository.existsById(id)) {

@@ -6,6 +6,7 @@ import com.example.wallet.model.enums.Role;
 import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.model.implementations.Client;
 import com.example.wallet.repository.ClientRepository;
+import com.example.wallet.repository.SupportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class ClientService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private SupportRepository supportRepository;
+
     public Client getByEmail(String email) {
         return clientRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedAccessException("Cliente no encontrado con email: " + email));
@@ -30,7 +34,13 @@ public class ClientService {
     // Registro
     public AccountClient registerClient(RegisterUserDto request) {
 
+        // Verificar email duplicado en clientes
         if (clientRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("El correo ya está registrado.");
+        }
+
+        // Verificar email duplicado también en la tabla de soportes/admins
+        if (supportRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("El correo ya está registrado.");
         }
 

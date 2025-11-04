@@ -2,6 +2,7 @@ package com.example.wallet.model.implementations;
 
 import com.example.wallet.model.enums.Role;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,8 @@ public abstract class User {
     @Column(unique = true, nullable = false)
     protected String email;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(name = "\"password\"")
     protected String password;
 
     @Enumerated(EnumType.STRING)

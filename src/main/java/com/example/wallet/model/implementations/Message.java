@@ -1,11 +1,13 @@
 package com.example.wallet.model.implementations;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+
 @Entity
 @Table(name = "message")
 @Data
@@ -21,6 +23,7 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "chat_id")
+    @JsonIgnore
     private Chat chat;
 
     @ManyToOne

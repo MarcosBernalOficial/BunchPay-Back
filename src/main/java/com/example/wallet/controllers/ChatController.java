@@ -15,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/chats")
@@ -30,9 +32,7 @@ public class ChatController {
     @Operation(summary = "Obtener chat", description = "Devuelve la lista de mensajes de un chat")
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<List<Message>> getMessages(@PathVariable Long chatId) {
-        Chat chat = chatService.getChatById(chatId).orElseThrow(() ->
-                new RuntimeException("Chat no encontrado")
-        );
+        Chat chat = chatService.getChatById(chatId).orElseThrow(() -> new RuntimeException("Chat no encontrado"));
         return ResponseEntity.ok(messageService.getMessagesByChat(chat));
     }
 
@@ -41,8 +41,7 @@ public class ChatController {
     public ResponseEntity<Message> sendMessage(
             @PathVariable Long chatId,
             @RequestBody String content,
-            Authentication auth
-    ) {
+            Authentication auth) {
         String email = auth.getName();
         User sender;
 
@@ -57,11 +56,58 @@ public class ChatController {
             }
         }
 
-        Chat chat = chatService.getChatById(chatId).orElseThrow(() ->
-                new RuntimeException("Chat no encontrado")
-        );
+        Chat chat = chatService.getChatById(chatId).orElseThrow(() -> new RuntimeException("Chat no encontrado"));
 
         Message msg = messageService.sendMessage(chat, sender, content);
         return ResponseEntity.ok(msg);
+    }
+
+    // ===== Endpoints para soporte =====
+
+    @Operation(summary = "Listar chats sin asignar")
+    @GetMapping("/support/unassigned")
+    public ResponseEntity<List<Map<String, Object>>> getUnassigned(Authentication auth) {
+        // Verificar que sea soporte
+        supportService.getByEmail(auth.getName());
+        var chats = chatService.getUnassignedChats().stream().map(this::toSummary).collect(Collectors.toList());
+        return ResponseEntity.ok(chats);
+    }
+
+    @Operation(summary = "Listar mis chats (soporte)")
+    @GetMapping("/support/my")
+    public ResponseEntity<List<Map<String, Object>>> getMyChats(Authentication auth) {
+        var support = supportService.getByEmail(auth.getName());
+        var chats = chatService.getChatsBySupport(support).stream().map(this::toSummary).collect(Collectors.toList());
+        return ResponseEntity.ok(chats);
+    }
+
+    @Operation(summary = "Asignarme un chat sin asignar")
+    @PostMapping("/{chatId}/assign")
+    public ResponseEntity<Map<String, Object>> assign(@PathVariable Long chatId, Authentication auth) {
+        var support = supportService.getByEmail(auth.getName());
+        var chat = chatService.getChatById(chatId).orElseThrow(() -> new RuntimeException("Chat no encontrado"));
+        if (chat.getSupport() == null) {
+            chatService.assignSupport(chat, support);
+        }
+        return ResponseEntity.ok(toSummary(chat));
+    }
+
+    @Operation(summary = "Cerrar chat")
+    @PostMapping("/{chatId}/close")
+    public ResponseEntity<Void> close(@PathVariable Long chatId, Authentication auth) {
+        // puede validar si el soporte del chat es el mismo del token
+        chatService.closeChat(chatId);
+        return ResponseEntity.ok().build();
+    }
+
+    private Map<String, Object> toSummary(Chat chat) {
+        return Map.of(
+                "id", chat.getId(),
+                "clientEmail", chat.getClient() != null ? chat.getClient().getEmail() : null,
+                "clientName",
+                chat.getClient() != null ? (chat.getClient().getFirstName() + " " + chat.getClient().getLastName())
+                        : null,
+                "supportEmail", chat.getSupport() != null ? chat.getSupport().getEmail() : null,
+                "closed", chat.isClosed());
     }
 }
