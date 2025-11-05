@@ -15,6 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChatService {
 
+    @SuppressWarnings("unused")
     @Autowired
     private MessageService messageService;
 
