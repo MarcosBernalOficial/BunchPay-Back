@@ -60,5 +60,15 @@ public class ChatWsController {
 
         // Broadcast a todos los suscriptos al chat
         messagingTemplate.convertAndSend("/topic/chats/" + chatId, payload);
+
+        // Si el chat no está asignado aún, notificar a soportes para refrescar la lista
+        // de "sin asignar"
+        if (chat.getSupport() == null && !chat.isClosed()) {
+            Map<String, Object> summary = new HashMap<>();
+            summary.put("id", chat.getId());
+            summary.put("clientName", chat.getClient() != null ? chat.getClient().getFirstName() : "");
+            summary.put("status", "updated");
+            messagingTemplate.convertAndSend("/topic/support/unassigned", summary);
+        }
     }
 }

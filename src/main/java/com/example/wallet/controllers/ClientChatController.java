@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 
@@ -28,6 +29,7 @@ public class ClientChatController {
     private final ChatService chatService;
     private final MessageService messageService;
     private final ClientService clientService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Operation(summary = "Obtener chats", description = "Devuelve la lista de chats")
     @GetMapping
@@ -67,12 +69,11 @@ public class ClientChatController {
         return ResponseEntity.ok(dtos);
     }
 
-
     @Operation(summary = "Enviar mensaje", description = "Envia un mensaje de un cliente al soporte")
     @PostMapping("/{chatId}/send")
     public ResponseEntity<MessageDto> sendMessage(@PathVariable Long chatId,
-                                                  @RequestBody String content,
-                                                  Authentication auth) {
+            @RequestBody String content,
+            Authentication auth) {
         Client sender = clientService.getByEmail(auth.getName());
         Chat chat = chatService.getChatById(chatId)
                 .orElseThrow(() -> new RuntimeException("Chat no encontrado"));
@@ -121,6 +122,12 @@ public class ClientChatController {
         dto.setClientName(saved.getClient().getFirstName());
         dto.setSupportName("No asignado");
         dto.setClosed(saved.isClosed());
+
+        // Notificar a soportes que hay un nuevo chat sin asignar
+        messagingTemplate.convertAndSend("/topic/support/unassigned", java.util.Map.of(
+                "id", saved.getId(),
+                "clientName", saved.getClient() != null ? saved.getClient().getFirstName() : "",
+                "status", "created"));
         return ResponseEntity.ok(dto);
     }
 

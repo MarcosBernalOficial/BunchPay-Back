@@ -53,10 +53,9 @@ public class ChatService {
     public List<Chat> getUnassignedChats() {
         return chatRepository.findAll().stream()
                 .filter(chat -> chat.getSupport() == null)
-                .filter(chat -> !messageService.getMessagesByChat(chat).isEmpty())
+                .filter(chat -> !chat.isClosed())
                 .toList();
     }
-
 
     public void closeChat(Long chatId) {
         Chat chat = chatRepository.findById(chatId)
@@ -70,15 +69,11 @@ public class ChatService {
         notificationService.createNotification(
                 chat.getClient(),
                 "Chat de soporte cerrado",
-                "El soporte ha cerrado tu chat. Si necesitás más ayuda, podés iniciar un nuevo chat desde tu cuenta."
-        );
+                "El soporte ha cerrado tu chat. Si necesitás más ayuda, podés iniciar un nuevo chat desde tu cuenta.");
     }
-
-
 
     public Optional<Chat> findOpenChatByClient(Client client) {
         return chatRepository.findFirstByClientAndClosedFalseOrderByIdDesc(client);
     }
-
 
 }
