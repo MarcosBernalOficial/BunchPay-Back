@@ -1,6 +1,5 @@
 package com.example.wallet.model.implementations;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +21,7 @@ public class AccountClient {
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Transaction> transactionsList;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

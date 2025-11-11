@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +42,7 @@ public class TransactionController {
 
     @Operation(summary = "Obtener transacciones", description = "Devuelve la lista de transacciones de la cuenta")
     @GetMapping("/viewAll")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<TransactionDto>> viewMyTransactions(Authentication auth) {
         String email = auth.getName();
 
