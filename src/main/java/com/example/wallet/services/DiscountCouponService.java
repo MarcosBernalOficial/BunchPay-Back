@@ -27,35 +27,57 @@ public class DiscountCouponService {
 
     private final Random random = new Random();
 
+    @Transactional
     public List<DiscountCoupon> getActiveCoupons(Long accountClientId) {
-        return discountCouponRepository.findByAccountClientIdAndExpirationDateAfter(accountClientId, LocalDate.now());
+        List<DiscountCoupon> active = discountCouponRepository
+                .findByAccountClientIdAndExpirationDateAfter(accountClientId, LocalDate.now());
+        if (active.isEmpty()) {
+            // Generar inmediatamente si la cuenta aún no tiene beneficios activos
+            accountClientRepository.findById(accountClientId).ifPresent(this::generateCouponsForAccount);
+            active = discountCouponRepository.findByAccountClientIdAndExpirationDateAfter(accountClientId,
+                    LocalDate.now());
+        }
+        return active;
     }
 
     @Transactional
-    @Scheduled(cron = "2 50 0 * * *") // 5:00 AM
+    @Scheduled(cron = "2 50 0 * * *") // 00:50 AM -> generar nuevos si faltan
     public void generateCouponsForAllUsers() {
-        List<AccountClient> accounts = accountClientRepository.findAll();
+        accountClientRepository.findAll().forEach(this::generateCouponsForAccount);
+    }
 
-        for (AccountClient account : accounts) {
-            List<DiscountCoupon> activeCoupons = getActiveCoupons(account.getId());
+    @Transactional
+    private void generateCouponsForAccount(AccountClient account) {
+        List<DiscountCoupon> activeCoupons = discountCouponRepository
+                .findByAccountClientIdAndExpirationDateAfter(account.getId(), LocalDate.now());
+        // Garantizar siempre al menos 3 cupones
+        while (activeCoupons.size() < 3) {
+            String company = getRandomCompanyExcluding(activeCoupons);
+            int discountPercent = randomBetween(5, 45);
+            String code = generateUniqueCode();
+            LocalDate expirationDate = LocalDate.now().plusDays(randomBetween(2, 7));
 
-            while (activeCoupons.size() < randomBetween(2, 5)) {
-                String company = getRandomCompany(account.getId());
-                int discountPercent = randomBetween(5, 45);
-                String code = generateUniqueCode();
-                LocalDate expirationDate = LocalDate.now().plusDays(randomBetween(2, 7));
+            DiscountCoupon coupon = new DiscountCoupon();
+            coupon.setAccountClient(account);
+            coupon.setCompany(company);
+            coupon.setDiscountPercent(discountPercent);
+            coupon.setCode(code);
+            coupon.setExpirationDate(expirationDate);
 
-                DiscountCoupon coupon = new DiscountCoupon();
-                coupon.setAccountClient(account);
-                coupon.setCompany(company);
-                coupon.setDiscountPercent(discountPercent);
-                coupon.setCode(code);
-                coupon.setExpirationDate(expirationDate);
+            discountCouponRepository.save(coupon);
+            activeCoupons.add(coupon);
+        }
+    }
 
-                discountCouponRepository.save(coupon);
-
-                activeCoupons.add(coupon);
-            }
+    @Transactional
+    @Scheduled(cron = "5 50 0 * * *") // 00:55 AM -> refrescar porcentaje diario
+    public void refreshDailyDiscountPercents() {
+        List<DiscountCoupon> allActiveToday = discountCouponRepository.findAll().stream()
+                .filter(c -> !c.getExpirationDate().isBefore(LocalDate.now()))
+                .toList();
+        for (DiscountCoupon coupon : allActiveToday) {
+            coupon.setDiscountPercent(randomBetween(5, 45));
+            discountCouponRepository.save(coupon);
         }
     }
 
@@ -71,12 +93,10 @@ public class DiscountCouponService {
         }
     }
 
-    private String getRandomCompany(Long accountClientId) {
-        List<DiscountCoupon> activeCoupons = getActiveCoupons(accountClientId);
-
+    @Transactional
+    private String getRandomCompanyExcluding(List<DiscountCoupon> activeCoupons) {
         List<String> availableCompanies = COMPANIES.stream()
-                .filter(company -> activeCoupons.stream()
-                        .noneMatch(c -> c.getCompany().equals(company)))
+                .filter(company -> activeCoupons.stream().noneMatch(c -> c.getCompany().equals(company)))
                 .toList();
 
         if (availableCompanies.isEmpty()) {

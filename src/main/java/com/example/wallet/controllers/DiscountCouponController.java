@@ -1,6 +1,5 @@
 package com.example.wallet.controllers;
 
-
 import com.example.wallet.dtos.DiscountCouponDto;
 import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.model.implementations.DiscountCoupon;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,6 +34,17 @@ public class DiscountCouponController {
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
         List<DiscountCoupon> coupons = discountCouponService.getActiveCoupons(accountClient.getId());
         // Mapear a DTO (opcional, pero recomendado)
+        List<DiscountCouponDto> dtos = coupons.stream().map(DiscountCouponDto::fromEntity).toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+    @Operation(summary = "Forzar generación de cupones", description = "Genera cupones si la cuenta no tiene activos")
+    @PostMapping("/generate-if-empty")
+    public ResponseEntity<List<DiscountCouponDto>> generateIfEmpty(Authentication auth) {
+        String email = auth.getName();
+        AccountClient accountClient = accountClientRepository.findByClientEmail(email)
+                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
+        List<DiscountCoupon> coupons = discountCouponService.getActiveCoupons(accountClient.getId());
         List<DiscountCouponDto> dtos = coupons.stream().map(DiscountCouponDto::fromEntity).toList();
         return ResponseEntity.ok(dtos);
     }

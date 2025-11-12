@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import java.util.List;
 @RequestMapping("/transactions")
 @Tag(name = "Transacciones", description = "Gestiona las transacciones de la cuenta del usuario")
 public class TransactionController {
+    private static final Logger log = LoggerFactory.getLogger(TransactionController.class);
     private final TransactionService transactionService;
     private final AccountClientRepository accountClientRepository;
 
@@ -32,11 +35,17 @@ public class TransactionController {
     @Operation(summary = "Realizar transferencia", description = "Realiza una transferencia")
     @PostMapping("/transfer")
     public ResponseEntity<String> createTransfer(@RequestBody @Valid TransferRequestDto dto, Authentication auth) {
+        String user = auth != null ? auth.getName() : "<anon>";
+        String reqId = java.util.UUID.randomUUID().toString();
+        log.info("[TX-CTRL] START reqId={} user={} alias={} cvu={} amount={}", reqId, user, dto.getReceiverAlias(),
+                dto.getReceiverCVU(), dto.getAmount());
         try {
             transactionService.transferMaker(dto, auth);
         } catch (Exception e) {
+            log.error("[TX-CTRL] ERROR reqId={} user={} msg={}", reqId, user, e.getMessage(), e);
             throw new RuntimeException(e);
         }
+        log.info("[TX-CTRL] END   reqId={} user={}", reqId, user);
         return ResponseEntity.ok("Transferencia realizada con éxito.");
     }
 
