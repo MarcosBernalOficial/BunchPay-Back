@@ -9,6 +9,7 @@ import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.model.implementations.Transaction;
 import com.example.wallet.repository.AccountClientRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class RechargeService {
     }
   }
 
+  @Transactional
   public void processRecharge(RechargeRequestDto dto, String email) throws Exception {
     AccountClient acc = accountClientRepository.findByClientEmail(email)
         .orElseThrow(() -> new UnauthorizedAccessException(email));
