@@ -6,6 +6,7 @@ import com.example.wallet.model.implementations.Support;
 import com.example.wallet.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class ChatService {
     private MessageService messageService;
 
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private ChatRepository chatRepository;
@@ -66,6 +68,10 @@ public class ChatService {
         chatRepository.save(chat);
 
         System.out.println("Notificando al cliente: " + chat.getClient().getEmail());
+
+        // Enviar notificación WebSocket al cliente
+        messagingTemplate.convertAndSend("/topic/chats/" + chatId + "/closed", "Chat cerrado por el soporte");
+
         // Notificar al cliente
         notificationService.createNotification(
                 chat.getClient(),
