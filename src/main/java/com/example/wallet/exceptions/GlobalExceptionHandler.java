@@ -1,7 +1,9 @@
 package com.example.wallet.exceptions;
 
+import com.example.wallet.controllers.exceptions.AccountNotFoundException;
 import com.example.wallet.controllers.exceptions.DniAlreadyExistException;
 import com.example.wallet.controllers.exceptions.EmailAlreadyExistsException;
+import com.example.wallet.controllers.exceptions.InsufficientBalanceException;
 import com.example.wallet.controllers.exceptions.InvalidLoginException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,7 @@ public class GlobalExceptionHandler {
         error.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
+
     @ExceptionHandler(DniAlreadyExistException.class)
     public ResponseEntity<Map<String, String>> handleDniExists(DniAlreadyExistException ex) {
         Map<String, String> error = new HashMap<>();
@@ -48,6 +51,22 @@ public class GlobalExceptionHandler {
         error.put("field", "general"); // se muestra arriba del form o como toast
         error.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleAccountNotFound(AccountNotFoundException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("field", "general");
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<Map<String, String>> handleInsufficientBalance(InsufficientBalanceException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("field", "general");
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(Exception.class)

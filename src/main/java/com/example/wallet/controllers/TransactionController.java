@@ -34,17 +34,13 @@ public class TransactionController {
 
     @Operation(summary = "Realizar transferencia", description = "Realiza una transferencia")
     @PostMapping("/transfer")
-    public ResponseEntity<String> createTransfer(@RequestBody @Valid TransferRequestDto dto, Authentication auth) {
+    public ResponseEntity<String> createTransfer(@RequestBody @Valid TransferRequestDto dto, Authentication auth)
+            throws Exception {
         String user = auth != null ? auth.getName() : "<anon>";
         String reqId = java.util.UUID.randomUUID().toString();
         log.info("[TX-CTRL] START reqId={} user={} alias={} cvu={} amount={}", reqId, user, dto.getReceiverAlias(),
                 dto.getReceiverCVU(), dto.getAmount());
-        try {
-            transactionService.transferMaker(dto, auth);
-        } catch (Exception e) {
-            log.error("[TX-CTRL] ERROR reqId={} user={} msg={}", reqId, user, e.getMessage(), e);
-            throw new RuntimeException(e);
-        }
+        transactionService.transferMaker(dto, auth);
         log.info("[TX-CTRL] END   reqId={} user={}", reqId, user);
         return ResponseEntity.ok("Transferencia realizada con éxito.");
     }
