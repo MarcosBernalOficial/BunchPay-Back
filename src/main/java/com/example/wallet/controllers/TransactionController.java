@@ -2,6 +2,7 @@ package com.example.wallet.controllers;
 
 import com.example.wallet.controllers.exceptions.UnauthorizedAccessException;
 import com.example.wallet.dtos.TransactionDto;
+import com.example.wallet.dtos.TransactionFilterDto;
 import com.example.wallet.dtos.TransferRequestDto;
 import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.repository.AccountClientRepository;
@@ -56,5 +57,17 @@ public class TransactionController {
 
         List<TransactionDto> transacciones = transactionService.viewAllTransactions(account);
         return ResponseEntity.ok(transacciones);
+    }
+
+    @Operation(summary = "Filtrado de operaciones", description = "Filtra las transacciones dependiendo del filtro aplicado")
+    @PostMapping("/filter")
+    public ResponseEntity<List<TransactionDto>> filterTransactions(TransactionFilterDto filter, Authentication auth){
+        String email = auth.getName();
+        AccountClient account = accountClientRepository.findByClientEmail(email)
+                .orElseThrow(() -> new UnauthorizedAccessException("Sesion expirada. Inicie sesion."));
+
+        List<TransactionDto> filteredTransactions = transactionService.getFilteredTransactions(account, filter);
+
+        return ResponseEntity.ok(filteredTransactions);
     }
 }
