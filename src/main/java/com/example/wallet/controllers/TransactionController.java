@@ -61,9 +61,13 @@ public class TransactionController {
 
     @Operation(summary = "Filtrado de operaciones", description = "Filtra las transacciones dependiendo del filtro aplicado")
     @PostMapping("/filter")
-    public ResponseEntity<List<TransactionDto>> filterTransactions(TransactionFilterDto filter, Authentication auth){
+    @Transactional
+    public ResponseEntity<List<TransactionDto>> filterTransactions(@RequestBody TransactionFilterDto filter,
+            Authentication auth) {
+        log.info("Filtro recibido - Type: {}, Month: {}", filter.getType(), filter.getMonth());
+
         String email = auth.getName();
-        AccountClient account = accountClientRepository.findByClientEmail(email)
+        AccountClient account = accountClientRepository.findByClientEmailWithTransactions(email)
                 .orElseThrow(() -> new UnauthorizedAccessException("Sesion expirada. Inicie sesion."));
 
         List<TransactionDto> filteredTransactions = transactionService.getFilteredTransactions(account, filter);

@@ -9,7 +9,7 @@ import com.example.wallet.dtos.TransferRequestDto;
 import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.model.implementations.Transaction;
 import com.example.wallet.repository.AccountClientRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
@@ -183,6 +183,7 @@ public class TransactionService {
   }
 
   // To filter transactions
+  @Transactional
   public List<TransactionDto> getFilteredTransactions(AccountClient account, TransactionFilterDto filter) {
     String email = account.getClient().getEmail();
 
