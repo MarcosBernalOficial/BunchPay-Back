@@ -40,7 +40,7 @@ public class ProfitService {
         return profitRepository.save(profit);
     }
 
-    @Scheduled(cron = "0 54 0 * * *")
+    @Scheduled(cron = "0 * * * * *") // Cada minuto para testing
     @Transactional
     public void generateDailyProfits() {
         List<AccountClient> accounts = accountClientRepository.findAll();
@@ -62,4 +62,3 @@ public class ProfitService {
     }
 
 }
-
