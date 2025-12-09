@@ -5,7 +5,9 @@ import com.example.wallet.controllers.exceptions.InsufficientBalanceException;
 import com.example.wallet.controllers.exceptions.UnauthorizedAccessException;
 import com.example.wallet.dtos.TransactionDto;
 import com.example.wallet.dtos.TransactionFilterDto;
+import com.example.wallet.dtos.TransactionSummaryDto;
 import com.example.wallet.dtos.TransferRequestDto;
+import com.example.wallet.model.enums.TransactionType;
 import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.model.implementations.Transaction;
 import com.example.wallet.repository.AccountClientRepository;
@@ -15,12 +17,13 @@ import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import static com.example.wallet.model.enums.TransactionType.RETIRO;
-import static com.example.wallet.model.enums.TransactionType.DEPOSITO;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.wallet.model.enums.TransactionType.*;
 
 @Service
 @RequiredArgsConstructor
@@ -201,6 +204,38 @@ public class TransactionService {
         .map(transaction -> mapToDto(transaction))
         .collect(Collectors.toList());
   }
+
+  /*
+  //Summary transaction
+  @Transactional
+  public TransactionSummaryDto getMonthlySummary(AccountClient account, int month, int year) {
+
+    TransactionSummaryDto dto = new TransactionSummaryDto();
+    dto.setMonth(month);
+    dto.setYear(year);
+
+    List<Transaction> filtered = account.getTransactionsList().stream()
+            .filter(t -> t.getDate().getMonthValue() == month &&
+                    t.getDate().getYear() == year)
+            .toList();
+
+    //Total of expences
+    BigDecimal totalExpenses = filtered.stream()
+            .filter(t -> t.getType() == RETIRO||
+                    t.getType() == sube ||
+                    t.getType() == celular ||
+                    t.getType() == steam ||
+                    t.getType() == PAGO)
+            .map(t -> BigDecimal.valueOf(t.getAmount()))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    dto.setTotalExpenses(totalExpenses);
+
+    //Total per category
+    Map<String, BigDecimal> categoryTotals = filtered.stream()
+            .filter(t -> t.getType() == T)
+
+  } */
 
   // Generate receipt with HTML and CSS
   public String generarComprobanteHtml(Transaction tr) {
