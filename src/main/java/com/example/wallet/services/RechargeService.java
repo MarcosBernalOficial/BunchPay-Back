@@ -61,7 +61,7 @@ public class RechargeService {
     trans.setAmount(dto.getAmount());
     trans.setDate(LocalDateTime.now());
     trans.setDescription("Recarga de servicio: " + dto.getType());
-    trans.setType(TransactionType.PAGO);
+    trans.setType(TransactionType.valueOf(dto.getType()));
     trans.setReciever(null);
     trans.setSender(acc.getClient());
     trans.setAccount(acc);
