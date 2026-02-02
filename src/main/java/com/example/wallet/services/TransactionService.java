@@ -206,36 +206,39 @@ public class TransactionService {
   }
 
   /*
-  //Summary transaction
-  @Transactional
-  public TransactionSummaryDto getMonthlySummary(AccountClient account, int month, int year) {
-
-    TransactionSummaryDto dto = new TransactionSummaryDto();
-    dto.setMonth(month);
-    dto.setYear(year);
-
-    List<Transaction> filtered = account.getTransactionsList().stream()
-            .filter(t -> t.getDate().getMonthValue() == month &&
-                    t.getDate().getYear() == year)
-            .toList();
-
-    //Total of expences
-    BigDecimal totalExpenses = filtered.stream()
-            .filter(t -> t.getType() == RETIRO||
-                    t.getType() == sube ||
-                    t.getType() == celular ||
-                    t.getType() == steam ||
-                    t.getType() == PAGO)
-            .map(t -> BigDecimal.valueOf(t.getAmount()))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-    dto.setTotalExpenses(totalExpenses);
-
-    //Total per category
-    Map<String, BigDecimal> categoryTotals = filtered.stream()
-            .filter(t -> t.getType() == T)
-
-  } */
+   * //Summary transaction
+   * 
+   * @Transactional
+   * public TransactionSummaryDto getMonthlySummary(AccountClient account, int
+   * month, int year) {
+   * 
+   * TransactionSummaryDto dto = new TransactionSummaryDto();
+   * dto.setMonth(month);
+   * dto.setYear(year);
+   * 
+   * List<Transaction> filtered = account.getTransactionsList().stream()
+   * .filter(t -> t.getDate().getMonthValue() == month &&
+   * t.getDate().getYear() == year)
+   * .toList();
+   * 
+   * //Total of expences
+   * BigDecimal totalExpenses = filtered.stream()
+   * .filter(t -> t.getType() == RETIRO||
+   * t.getType() == sube ||
+   * t.getType() == celular ||
+   * t.getType() == steam ||
+   * t.getType() == PAGO)
+   * .map(t -> BigDecimal.valueOf(t.getAmount()))
+   * .reduce(BigDecimal.ZERO, BigDecimal::add);
+   * 
+   * dto.setTotalExpenses(totalExpenses);
+   * 
+   * //Total per category
+   * Map<String, BigDecimal> categoryTotals = filtered.stream()
+   * .filter(t -> t.getType() == T)
+   * 
+   * }
+   */
 
   // Generate receipt with HTML and CSS
   public String generarComprobanteHtml(Transaction tr) {
@@ -305,9 +308,7 @@ public class TransactionService {
             <div class="dato"><b>Remitente:</b> %s %s</div>
             <div class="dato"><b>CVU Remitente:</b> %s</div>
             <div class="dato"><b>Destinatario:</b> %s %s</div>
-            <div class="dato"><b>CVU Destinatario:</b> %s</div>
             <div class="dato"><b>Descripción:</b> %s</div>
-            <div class="detalles">ID de Transacción: %s</div>
             <div class="footer">Gracias por usar BunchPay</div>
           </div>
         </body>
@@ -318,9 +319,7 @@ public class TransactionService {
         tx.getSenderFirstName(), tx.getSenderLastName(),
         tx.getSenderCvu(),
         tx.getRecieverFirstName(), tx.getRecieverLastName(),
-        tx.getRecieverCvu(),
-        tx.getDescription(),
-        tx.getTransactionId() != null ? tx.getTransactionId() : "-");
+        tx.getDescription());
   }
 
 }
