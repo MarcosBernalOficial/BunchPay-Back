@@ -5,9 +5,7 @@ import com.example.wallet.controllers.exceptions.InsufficientBalanceException;
 import com.example.wallet.controllers.exceptions.UnauthorizedAccessException;
 import com.example.wallet.dtos.TransactionDto;
 import com.example.wallet.dtos.TransactionFilterDto;
-import com.example.wallet.dtos.TransactionSummaryDto;
 import com.example.wallet.dtos.TransferRequestDto;
-import com.example.wallet.model.enums.TransactionType;
 import com.example.wallet.model.implementations.AccountClient;
 import com.example.wallet.model.implementations.Transaction;
 import com.example.wallet.repository.AccountClientRepository;
@@ -18,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
